@@ -126,18 +126,17 @@ def serve_mineru_file(extract_id, filepath):
         root_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], 'mineru_files', extract_id)
         full_path = Path(root_dir) / filepath
 
-        # Enhanced path traversal protection with symlink resolution
-        # Resolve real paths (including symlinks) and check if the resolved path
-        # is a child of the resolved root directory
+        # This prevents path traversal attacks
+        resolved_root_dir = Path(root_dir).resolve()
+        
         try:
-            resolved_full_path = full_path.resolve(strict=True)
-            resolved_root_dir = Path(root_dir).resolve(strict=True)
-            
-            # Check if resolved path is relative to resolved root directory
-            if not resolved_full_path.is_relative_to(resolved_root_dir):
+            # Check if the path is trying to escape the root directory
+            resolved_full_path = full_path.resolve()
+            if not str(resolved_full_path).startswith(str(resolved_root_dir)):
                 return error_response('INVALID_PATH', 'Invalid file path', 403)
-        except FileNotFoundError:
-            return not_found('File')
+        except Exception:
+            # If we can't resolve the path at all, it's invalid
+            return error_response('INVALID_PATH', 'Invalid file path', 403)
 
         # Try to find file with prefix matching
         matched_path = find_file_with_prefix(full_path)
@@ -146,12 +145,14 @@ def serve_mineru_file(extract_id, filepath):
             # Additional security check for matched path
             try:
                 resolved_matched_path = matched_path.resolve(strict=True)
-                resolved_root_dir = Path(root_dir).resolve(strict=True)
                 
-                if not resolved_matched_path.is_relative_to(resolved_root_dir):
+                # Verify the matched file is still within the root directory
+                if not str(resolved_matched_path).startswith(str(resolved_root_dir)):
                     return error_response('INVALID_PATH', 'Invalid file path', 403)
             except FileNotFoundError:
                 return not_found('File')
+            except Exception:
+                return error_response('INVALID_PATH', 'Invalid file path', 403)
             
             return send_from_directory(str(matched_path.parent), matched_path.name)
 
