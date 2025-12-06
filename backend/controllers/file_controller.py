@@ -3,7 +3,9 @@ File Controller - handles static file serving
 """
 from flask import Blueprint, send_from_directory, current_app
 from utils import error_response, not_found
+from utils.path_utils import find_file_with_prefix
 import os
+from pathlib import Path
 from werkzeug.utils import secure_filename
 
 file_bp = Blueprint('files', __name__, url_prefix='/files')
@@ -107,6 +109,34 @@ def serve_global_material(filename):
         # Serve file
         return send_from_directory(file_dir, safe_filename)
     
+    except Exception as e:
+        return error_response('SERVER_ERROR', str(e), 500)
+
+
+@file_bp.route('/mineru/<extract_id>/<path:filepath>', methods=['GET'])
+def serve_mineru_file(extract_id, filepath):
+    """
+    GET /files/mineru/{extract_id}/{filepath} - Serve MinerU extracted files.
+
+    Args:
+        extract_id: Extract UUID
+        filepath: Relative file path within the extract
+    """
+    try:
+        root_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], 'mineru_files', extract_id)
+        full_path = Path(root_dir) / filepath
+
+        # Basic path traversal protection
+        if not os.path.abspath(str(full_path)).startswith(os.path.abspath(root_dir)):
+            return error_response('INVALID_PATH', 'Invalid file path', 403)
+
+        # Try to find file with prefix matching
+        matched_path = find_file_with_prefix(full_path)
+        
+        if matched_path is not None:
+            return send_from_directory(str(matched_path.parent), matched_path.name)
+
+        return not_found('File')
     except Exception as e:
         return error_response('SERVER_ERROR', str(e), 500)
 
