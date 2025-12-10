@@ -83,8 +83,6 @@ docker-compose*.yml
 uv.lock
 LICENSE
 PRD.md
-API设计文档.md
-快速启动指南.md
 *.md
 
 # Windows
