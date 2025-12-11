@@ -159,8 +159,16 @@ cp .env.example .env
 
 编辑 `.env` 文件，配置必要的环境变量：
 ```env
-GOOGLE_API_KEY=your-google-api-key-here
+# AI Provider格式配置 (gemini / openai)
+AI_PROVIDER_FORMAT=gemini
+
+# Gemini 格式配置（当 AI_PROVIDER_FORMAT=gemini时使用）
+GOOGLE_API_KEY=your-api-key-here
 GOOGLE_API_BASE=https://generativelanguage.googleapis.com
+
+# OpenAI 格式配置（当 AI_PROVIDER_FORMAT=openai 时使用）
+OPENAI_API_KEY=your-api-key-here
+OPENAI_API_BASE=https://api.openai.com/v1
 ...
 ```
 
