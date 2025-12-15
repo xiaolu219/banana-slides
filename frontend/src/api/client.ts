@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // 开发环境：通过 Vite proxy 转发
 // 生产环境：通过 nginx proxy 转发
-const API_BASE_URL = '';
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
 // 创建 axios 实例
 export const apiClient = axios.create({
