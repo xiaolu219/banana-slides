@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 import sqlite3
+from flask_cors import CORS
 
 # Load environment variables from project root .env file
 _project_root = Path(__file__).parent.parent
@@ -48,6 +49,8 @@ def set_sqlite_pragma(dbapi_conn, connection_record):
 def create_app():
     """Application factory"""
     app = Flask(__name__)
+    # 允许所有域名访问，彻底解决 CORS 问题
+CORS(app, resources={r"/*": {"origins": "*"}})
     
     # Load configuration from Config class
     app.config.from_object(Config)
