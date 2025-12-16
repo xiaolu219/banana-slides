@@ -94,7 +94,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 
     # Initialize extensions
     db.init_app(app)
-    CORS(app, origins=cors_origins)
+    #CORS(app, origins=cors_origins)
     
     # Register blueprints
     app.register_blueprint(project_bp)
