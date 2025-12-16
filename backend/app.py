@@ -50,7 +50,7 @@ def create_app():
     """Application factory"""
     app = Flask(__name__)
     # 允许所有域名访问，彻底解决 CORS 问题
-CORS(app, resources={r"/*": {"origins": "*"}})
+#CORS(app, resources={r"/*": {"origins": "*"}})
     
     # Load configuration from Config class
     app.config.from_object(Config)
@@ -94,7 +94,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 
     # Initialize extensions
     db.init_app(app)
-    #CORS(app, origins=cors_origins)
+    CORS(app, origins=cors_origins)
     
     # Register blueprints
     app.register_blueprint(project_bp)
